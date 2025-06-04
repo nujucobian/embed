@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coda Embed Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0; /* Important for iframe to look clean */
+            padding: 15px;
+            background-color: #e0f7fa; /* Light cyan background */
+            color: #00796b; /* Dark teal text */
+            border: 2px dashed #004d40;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #004d40; /* Darker teal for heading */
+            margin-top: 0;
+        }
+        p {
+            font-size: 1.1em;
+        }
+        .highlight {
+            background-color: #fff9c4; /* Light yellow highlight */
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Styled Text from GitHub Pages!</h1>
+    <p>This content is being served from a GitHub Pages site and should be embedded in Coda.</p>
+    <p>It has a <span class="highlight">custom background</span>, text colors, and other styles.</p>
+    <p id="dynamicMessage"></p>
+
+    <script>
+        // Optional: Add JavaScript to read URL parameters for dynamic content
+        const params = new URLSearchParams(window.location.search);
+        const message = params.get('message');
+        const bgColor = params.get('bgColor');
+
+        if (message) {
+            document.getElementById('dynamicMessage').textContent = "Message from URL: " + message;
+        } else {
+            document.getElementById('dynamicMessage').textContent = "No dynamic message passed via URL.";
+        }
+
+        if (bgColor) {
+            document.body.style.backgroundColor = bgColor;
+        }
+    </script>
+</body>
+</html>
