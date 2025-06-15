@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calendar with Two Highlights</title>
+  <title>Calendar with Two Highlights and Dynamic Scale</title>
   <style>
     .calendar {
       display: grid;
@@ -35,7 +35,7 @@
     }
 
     .calendar-button.day-header {
-      font-size: 60px;  /* adjusted font size */
+      font-size: 60px;
       font-weight: bold;
       cursor: default;
       background-color: transparent;
@@ -70,7 +70,9 @@
 </head>
 <body>
 
-  <div class="calendar" id="calendar"></div>
+  <div id="calendar-wrapper">
+    <div class="calendar" id="calendar"></div>
+  </div>
 
   <script>
     function getUrlParams() {
@@ -81,6 +83,16 @@
       });
       return params;
     }
+
+    const params = getUrlParams();
+
+    // Apply scale from URL param, default 1
+    const scale = parseFloat(params.scale) || 1;
+    const wrapper = document.getElementById('calendar-wrapper');
+    wrapper.style.transformOrigin = 'top left';
+    wrapper.style.transform = `scale(${scale})`;
+    wrapper.style.width = `${(100 / scale)}%`;
+    wrapper.style.height = `${(100 / scale)}%`;
 
     function generateCalendar(year, month, highlights, highlights2) {
       const calendarDiv = document.getElementById('calendar');
@@ -145,7 +157,6 @@
       }
     }
 
-    const params = getUrlParams();
     const now = new Date();
     const year = params.year ? parseInt(params.year) : now.getFullYear();
     const month = params.month ? parseInt(params.month) : now.getMonth() + 1;
