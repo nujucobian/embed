@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Calendar with Two Highlights and Dynamic Scale</title>
   <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
     .calendar {
       display: grid;
       grid-template-columns: repeat(7, 100px);
@@ -137,7 +143,6 @@
           }
 
           if (highlights2.has(dayNum)) {
-            // Light red highlight has priority
             btn.classList.add('highlight2');
           } else if (highlights.has(dayNum)) {
             btn.classList.add('highlight');
