@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dynamic Calendar</title>
+  <title>Calendar with Highlighted Days</title>
   <style>
     .calendar {
       display: grid;
       grid-template-columns: repeat(7, 100px);
-      grid-template-rows: repeat(6, 100px);
+      grid-template-rows: repeat(7, 100px);
       gap: 8px;
       justify-content: center;
       margin-top: 20px;
@@ -16,27 +16,48 @@
     }
 
     .calendar-button {
-      background-color: #4CAF50;
+      border: 2px solid black;
       border-radius: 25px;
       display: flex;
       justify-content: center;
       align-items: center;
-      color: white;
       font-size: 80px;
       font-family: Arial, sans-serif;
       line-height: 1;
       cursor: pointer;
-      border: none;
-    }
-
-    .calendar-button.empty {
+      outline: none;
+      user-select: none;
       background-color: transparent;
-      cursor: default;
-      box-shadow: none;
+      color: black;
+      padding: 0;
+      margin: 0;
+      transition: background-color 0.3s;
     }
 
-    .calendar-button:hover:not(.empty) {
-      background-color: #45a049;
+    .calendar-button.day-header {
+      font-size: 30px;
+      font-weight: bold;
+      cursor: default;
+      background-color: transparent;
+      color: black;
+      pointer-events: none;
+    }
+
+    .calendar-button.outside-month {
+      color: #888;
+      cursor: default;
+    }
+
+    .calendar-button.current-month {
+      color: black;
+    }
+
+    .calendar-button.today {
+      font-weight: bold;
+    }
+
+    .calendar-button.highlight {
+      background-color: #b6f3a1; /* light green */
     }
   </style>
 </head>
@@ -54,27 +75,33 @@
       return params;
     }
 
-    function generateCalendar(year, month) {
+    function generateCalendar(year, month, highlights) {
       const calendarDiv = document.getElementById('calendar');
       calendarDiv.innerHTML = ''; // Clear previous content
 
-      // month: 1-based (Jan=1) from URL param, convert to 0-based for JS Date
-      const jsMonth = month - 1;
+      // Add weekday headers
+      const days = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+      days.forEach(day => {
+        const headerBtn = document.createElement('button');
+        headerBtn.textContent = day;
+        headerBtn.classList.add('calendar-button', 'day-header');
+        calendarDiv.appendChild(headerBtn);
+      });
 
-      // First day of month (Date object)
+      const jsMonth = month - 1; // zero-based
+
       const firstDay = new Date(year, jsMonth, 1);
-
-      // Day of week for first day: JS 0=Sunday, 1=Monday ... 6=Saturday
-      // We want weeks starting on Monday, so convert:
-      // Monday=0, Tuesday=1 ... Sunday=6
       let startDay = firstDay.getDay() - 1;
-      if (startDay === -1) startDay = 6; // Sunday
+      if (startDay === -1) startDay = 6; // Sunday fix
 
-      // Number of days in the month
       const daysInMonth = new Date(year, month, 0).getDate();
+      const prevMonthDays = new Date(year, jsMonth, 0).getDate();
 
-      // Total cells = 42 (6 rows * 7 days)
-      const totalCells = 42;
+      const today = new Date();
+      const isCurrentMonth = (year === today.getFullYear() && month === (today.getMonth() + 1));
+      const todayDate = today.getDate();
+
+      const totalCells = 42; // 6 weeks * 7 days
 
       for (let i = 0; i < totalCells; i++) {
         const btn = document.createElement('button');
@@ -84,24 +111,43 @@
 
         if (dayNum > 0 && dayNum <= daysInMonth) {
           btn.textContent = dayNum;
-        } else {
-          btn.classList.add('empty');
+          btn.classList.add('current-month');
+
+          if (isCurrentMonth && dayNum === todayDate) {
+            btn.classList.add('today');
+          }
+
+          if (highlights.has(dayNum)) {
+            btn.classList.add('highlight');
+          }
+
+        } else if (dayNum <= 0) {
+          btn.textContent = prevMonthDays + dayNum;
+          btn.classList.add('outside-month');
           btn.disabled = true;
-          btn.textContent = '';
+        } else {
+          btn.textContent = dayNum - daysInMonth;
+          btn.classList.add('outside-month');
+          btn.disabled = true;
         }
 
         calendarDiv.appendChild(btn);
       }
     }
 
-    // Get URL params
     const params = getUrlParams();
-    // Default to current month/year if not provided
     const now = new Date();
     const year = params.year ? parseInt(params.year) : now.getFullYear();
     const month = params.month ? parseInt(params.month) : now.getMonth() + 1;
+    const highlightParam = params.highlight || '';
+    // Parse highlight param into a Set of numbers
+    const highlights = new Set(
+      highlightParam.split(',')
+        .map(x => parseInt(x.trim()))
+        .filter(n => !isNaN(n))
+    );
 
-    generateCalendar(year, month);
+    generateCalendar(year, month, highlights);
   </script>
 
 </body>
