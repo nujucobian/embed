@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calendar with Highlighted Days</title>
+  <title>Calendar with Two Highlights</title>
   <style>
     .calendar {
       display: grid;
@@ -59,6 +59,10 @@
     .calendar-button.highlight {
       background-color: #b6f3a1; /* light green */
     }
+
+    .calendar-button.highlight2 {
+      background-color: #f3a1a1; /* light red */
+    }
   </style>
 </head>
 <body>
@@ -75,7 +79,7 @@
       return params;
     }
 
-    function generateCalendar(year, month, highlights) {
+    function generateCalendar(year, month, highlights, highlights2) {
       const calendarDiv = document.getElementById('calendar');
       calendarDiv.innerHTML = ''; // Clear previous content
 
@@ -117,7 +121,10 @@
             btn.classList.add('today');
           }
 
-          if (highlights.has(dayNum)) {
+          if (highlights2.has(dayNum)) {
+            // Light red highlight has priority
+            btn.classList.add('highlight2');
+          } else if (highlights.has(dayNum)) {
             btn.classList.add('highlight');
           }
 
@@ -139,15 +146,24 @@
     const now = new Date();
     const year = params.year ? parseInt(params.year) : now.getFullYear();
     const month = params.month ? parseInt(params.month) : now.getMonth() + 1;
+
+    // Parse highlight parameters into Sets
     const highlightParam = params.highlight || '';
-    // Parse highlight param into a Set of numbers
+    const highlight2Param = params.highlight2 || '';
+
     const highlights = new Set(
       highlightParam.split(',')
         .map(x => parseInt(x.trim()))
         .filter(n => !isNaN(n))
     );
 
-    generateCalendar(year, month, highlights);
+    const highlights2 = new Set(
+      highlight2Param.split(',')
+        .map(x => parseInt(x.trim()))
+        .filter(n => !isNaN(n))
+    );
+
+    generateCalendar(year, month, highlights, highlights2);
   </script>
 
 </body>
